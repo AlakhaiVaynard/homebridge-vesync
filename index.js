@@ -1,9 +1,8 @@
 "use strict";
 
-let EtekCityClient = require('./lib/client');
+let EtekcityClient = require('./lib/client');
 
-let config = require('./lib/config.json');
-let client = new EtekCityClient();
+let client = new EtekcityClient();
 
 //var vesync = require('./lib/vesync.js');
 var Accessory, Service, Characteristic, UUIDGen;
@@ -24,7 +23,8 @@ function VeseyncPlugPlatform(log, config, api) {
     this.accessories = [];
     this.cache_timeout = 10; // seconds
     this.debug = config['debug'] || false;
-
+    this.username = config['username'];
+    this.password = config['password'];
 
     if (api) {
         this.api = api;
@@ -48,7 +48,7 @@ VeseyncPlugPlatform.prototype.didFinishLaunching = function() {
 }
 
 VeseyncPlugPlatform.prototype.devicePolling = function() {
-    var me = this;
+    /*var me = this;
 
     // Send a return status message every interval
     for (var id in this.accessories) {
@@ -58,15 +58,17 @@ VeseyncPlugPlatform.prototype.devicePolling = function() {
         me.getPowerState(plug, function(err, status) {
           me.log("Got status: " + status);
         })
-    }
+    }*/
 }
 
 VeseyncPlugPlatform.prototype.deviceDiscovery = function() {
-    // Send a device discovery message every interval
-    if (this.debug)
-        console.log("Sending device discovery message");
+    var me = this;
 
-    client.login(config.username, config.password).then( () => {
+    // Send a device discovery message every interval
+    if (me.debug)
+        me.log("Sending device discovery message");
+
+    client.login(this.username, this.password).then( () => {
         return client.getDevices();
     }).then( devices => {
           if (this.debug) this.log("Adding discovered devices");
@@ -74,22 +76,22 @@ VeseyncPlugPlatform.prototype.deviceDiscovery = function() {
           for (var i in devices) {
               var existing = this.accessories[devices[i].id];
               if (!existing) {
-                  console.log("Adding:", devices[i].id, devices[i].name);
+                  me.log("Adding:", devices[i].id, devices[i].name);
                   this.addAccessory(devices[i]);
               } else {
-                  if (this.debug) this.log("Skipping existing device", i);
+                  if (this.debug) me.log("Skipping existing device", i);
               }
           }
           if (devices) {
               for (var id in this.accessories) {
                   var found = devices.find( (device) => { return device.id.includes(id); });
                   if (!found) {
-                      console.log("Not found ", id);
+                      me.log("Not found ", id);
                       removeAccessory(this.accessories[id]);
                   }
               }
           }
-      if (this.debug) this.log("Discovery complete");
+      if (this.debug) me.log("Discovery complete");
     });
 }
 
@@ -139,10 +141,10 @@ VeseyncPlugPlatform.prototype.setService = function(accessory) {
 VeseyncPlugPlatform.prototype.getInitState = function(accessory, data) {
     var info = accessory.getService(Service.AccessoryInformation);
 
-    accessory.context.manufacturer = "ETekCity Plugs";
+    accessory.context.manufacturer = "Etekcity";
     info.setCharacteristic(Characteristic.Manufacturer, accessory.context.manufacturer);
 
-    accessory.context.model = "CT-065W";
+    accessory.context.model = "ESW01-USA";
     info.setCharacteristic(Characteristic.Model, accessory.context.model);
 
     info.setCharacteristic(Characteristic.SerialNumber, accessory.context.id);
@@ -158,7 +160,7 @@ VeseyncPlugPlatform.prototype.setPowerState = function(thisPlug, powerState, cal
     if (this.debug)
         console.log("Sending device status change");
 
-    return client.login(config.username, config.password).then( () => {
+    return client.login(this.username, this.password).then( () => {
         return client.getDevices();
     }).then( devices => {
       return devices.find( (device) => { return device.name.includes(thisPlug.name); });
@@ -182,7 +184,7 @@ VeseyncPlugPlatform.prototype.getPowerState = function(thisPlug, callback) {
         this.log("Getting Status: %s %s", thisPlug.id, thisPlug.name)
         if (this.debug) console.log("Sending device status message");
 
-        return client.login(config.username, config.password).then( () => {
+        return client.login(this.username, this.password).then( () => {
             return client.getDevices();
         }).then( devices => {
           return devices.find( (device) => { return device.name.includes(thisPlug.name); });
