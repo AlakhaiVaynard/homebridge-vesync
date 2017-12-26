@@ -34,7 +34,7 @@ function VeseyncPlugPlatform(log, config, api) {
 
 VeseyncPlugPlatform.prototype.configureAccessory = function(accessory) {
     var accessoryId = accessory.context.id;
-    console.log("configureAccessory");
+    this.log("configureAccessory");
     this.setService(accessory);
     this.accessories[accessoryId] = accessory;
 }
@@ -158,7 +158,7 @@ VeseyncPlugPlatform.prototype.setPowerState = function(thisPlug, powerState, cal
     var that = this;
 
     if (this.debug)
-        console.log("Sending device status change");
+        this.log("Sending device status change");
 
     return client.login(this.username, this.password).then( () => {
         return client.getDevices();
@@ -174,7 +174,10 @@ VeseyncPlugPlatform.prototype.setPowerState = function(thisPlug, powerState, cal
           return client.turnOn(device.id);
         }
     }).then( () => {
-      callback(null, true);
+      callback();
+    }).catch( (err) => {
+      this.log("Failed to set power state to", powerState);
+      callback(err);
     })
 }
 
@@ -182,7 +185,7 @@ VeseyncPlugPlatform.prototype.setPowerState = function(thisPlug, powerState, cal
 VeseyncPlugPlatform.prototype.getPowerState = function(thisPlug, callback) {
     if (this.accessories[thisPlug.id]) {
         this.log("Getting Status: %s %s", thisPlug.id, thisPlug.name)
-        if (this.debug) console.log("Sending device status message");
+        if (this.debug) this.log("Sending device status message");
 
         return client.login(this.username, this.password).then( () => {
             return client.getDevices();
