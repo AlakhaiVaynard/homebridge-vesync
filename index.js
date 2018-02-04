@@ -192,9 +192,15 @@ VeseyncPlugPlatform.prototype.getPowerState = function(thisPlug, callback) {
         }).then( devices => {
           return devices.find( (device) => { return device.name.includes(thisPlug.name); });
         }).then( (device) => {
-            thisPlug.status = device.status;
-            if (this.debug) this.log("Discovery complete");
-            callback(null, device.status == 'open');
+            if (typeof device === 'undefined') {
+                if (this.debug) this.log("Removing undefined device", thisPlug.name);
+                removeAccessory(thisPlug)
+            }
+            else {
+                thisPlug.status = device.status;
+                if (this.debug) this.log("Discovery complete");
+                callback(null, device.status == 'open');
+            }
         });
     } else {
         callback(new Error("Device not found"));
