@@ -38,10 +38,13 @@ VeseyncPlugPlatform.prototype.configureAccessory = function(accessory) {
         this.log("Duplicate accessory detected, removing existing if possible, otherwise removing this accessory", accessoryId);
         try {
             this.removeAccessory(this.accessories[accessoryId], accessoryId);
+            this.setService(accessory);
         } catch (error) {
             this.removeAccessory(accessory, accessoryId);
             accessory = this.accessories[accessoryId];
         }
+    } else {
+        this.setService(accessory);
     }
 
     this.accessories[accessoryId] = accessory;
