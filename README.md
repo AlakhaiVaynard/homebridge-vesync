@@ -37,5 +37,7 @@ Configuration sample:
 ## Credits
 
 - AlakhaiVaynard   - Inital Code
+- KaidenR - Bug Fix, Issue #1
+- rossmckelvie - Code Improvements, Bug Fix Issue #3
 - Danimal4326 / NorthernMan54  - Used [homebridge-ecoplug](https://github.com/NorthernMan54/homebridge-ecoplug) as a template for platform registration and required operations for on/off
 - dirwin517 / keatontaylor - Used [etekcity-smartplug](https://github.com/arupex/etekcity-smartplug) as a template for sending the commands to vesync to control the outlet

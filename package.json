@@ -1,6 +1,6 @@
 {
   "name": "homebridge-vesync",
-  "version": "0.9.2",
+  "version": "0.9.5",
   "description": "A Homebridge plugin for controlling EtekCity smart outlets by issuing commands to the VeSync site. ",
   "main": "index.js",
   "scripts": {
