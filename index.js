@@ -185,12 +185,12 @@ VeseyncPlugPlatform.prototype.setPowerState = function(thisPlug, powerState, cal
         return devices.find( (device) => { return device.name.includes(thisPlug.name); });
     }).then( (device) => {
         thisPlug.status = device.status;
-        if (device.status == 'open' && powerState == false) {
-            return this.client.turnOff(device.id);
+        if (device.status == 'on' && powerState == false) {
+            return this.client.turnOff(device);
         }
 
-        if (device.status == 'break' && powerState == true) {
-            return this.client.turnOn(device.id);
+        if (device.status == 'off' && powerState == true) {
+            return this.client.turnOn(device);
         }
     }).then( () => {
         callback();
@@ -215,7 +215,7 @@ VeseyncPlugPlatform.prototype.getPowerState = function(thisPlug, callback) {
             } else {
                 thisPlug.status = device.status;
                 if (this.debug) this.log("getPowerState complete");
-                callback(null, device.status == 'open');
+                callback(null, device.status == 'on');
             }
         });
     } else {
